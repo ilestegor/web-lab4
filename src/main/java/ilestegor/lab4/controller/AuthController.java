@@ -4,16 +4,16 @@ import ilestegor.lab4.dto.JWTRequestDto;
 import ilestegor.lab4.dto.JwtResponseDto;
 import ilestegor.lab4.security.IJwtUtils;
 import ilestegor.lab4.service.UserService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -29,15 +29,17 @@ public class AuthController {
     }
 
     @PostMapping("login")
-    public ResponseEntity<JwtResponseDto> login(@RequestBody JWTRequestDto requestDto){
+    public ResponseEntity<JwtResponseDto> login(@RequestBody JWTRequestDto requestDto, HttpServletResponse response){
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(requestDto.username(), requestDto.password()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = ijwtUtils.generateAccessToken(authentication);
-        return new ResponseEntity<>(new JwtResponseDto(token), HttpStatus.OK);
-
+        Cookie cookie = new Cookie("Token", token);
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(3600);
+        response.addCookie(cookie);
+        return new ResponseEntity<>(new JwtResponseDto(token, "Bearer"), HttpStatus.OK);
     }
-
     @PostMapping("register")
     public ResponseEntity<String> register(@RequestBody JWTRequestDto requestDto){
         if (userService.isUserExistByName(requestDto.username())){

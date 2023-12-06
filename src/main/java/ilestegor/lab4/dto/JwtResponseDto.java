@@ -4,15 +4,16 @@ public class JwtResponseDto {
     private final String accessToken;
     private String tokenType;
 
-    public JwtResponseDto(String accessToke) {
-        this.accessToken = accessToke;
+    public JwtResponseDto(String accessToken, String tokenType) {
+        this.accessToken = accessToken;
+        this.tokenType = tokenType;
     }
 
-    public String getAccessToke() {
+    public String getAccessToken() {
         return accessToken;
     }
 
-    public String getTokeType() {
+    public String getTokenType() {
         return tokenType;
     }
 
