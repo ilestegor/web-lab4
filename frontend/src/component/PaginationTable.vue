@@ -62,8 +62,8 @@ export default {
         v-model="curPage"
         prev-button-content="⬅️"
         next-button-content="➡️"
-        back-button-class="first"
-        next-button-class="last-btn"
+        back-button-class="arrow-style"
+        next-button-class="arrow-style"
     />
     <table>
       <thead>
@@ -126,5 +126,16 @@ table, th, tr, td{
 }
 .active-page:hover {
   background-color: #2988c8;
+}
+.arrow-style{
+  background-color: transparent;
+  border: none;
+}
+.paginate-buttons{
+  background-color: transparent;
+  color: white;
+}
+.paginate-buttons:hover{
+  background-color: transparent;
 }
 </style>

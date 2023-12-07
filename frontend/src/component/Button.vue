@@ -1,16 +1,11 @@
 <script>
 export default {
   name: "my-button",
-  methods:{
-    onClickFunc(){
-      this.$emit('click')
-    }
-  }
 }
 </script>
 
 <template>
-    <button class="btn" @click="onClickFunc">
+    <button class="btn">
       <slot></slot>
     </button>
 </template>

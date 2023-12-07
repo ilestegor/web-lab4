@@ -2,30 +2,16 @@
 
 
 import PaginationTable from "@/component/PaginationTable.vue";
-import ContentBox from "@/component/ContentBox.vue";
-import CustomInput from "@/component/CustomInput.vue";
-import MyButton from "@/component/Button.vue";
-
+import useVuelidate from "@vuelidate/core";
+import {required, helpers, maxValue, between} from "@vuelidate/validators";
+const RED_COLOR = "#00fff7";
+const GREEN_COLOR = "#aa00ff"
 export default {
   name: "MainPage",
-  components: {MyButton, CustomInput, ContentBox, PaginationTable},
+  components: {PaginationTable},
   data(){
     return{
       mock: [
-        {x:1, y:2, r:3, exec:233421, cur:"fdsa", hit:true},
-        {x:2, y:3, r:4, exec:233421, cur:"fdsa", hit:true},
-        {x:3, y:2, r:3, exec:233421, cur:"fdsa", hit:true},
-        {x:4, y:2, r:3, exec:233421, cur:"fdsa", hit:true},
-        {x:5, y:2, r:3, exec:233421, cur:"fdsa", hit:true},
-        {x:6, y:2, r:3, exec:233421, cur:"fdsa", hit:true},
-        {x:7, y:2, r:3, exec:233421, cur:"fdsa", hit:true},
-        {x:8, y:2, r:3, exec:233421, cur:"fdsa", hit:true},
-        {x:9, y:2, r:3, exec:233421, cur:"fdsa", hit:true},
-        {x:10, y:2, r:3, exec:233421, cur:"fdsa", hit:true},
-        {x:11, y:2, r:3, exec:233421, cur:"fdsa", hit:true},
-        {x:12, y:2, r:3, exec:233421, cur:"fdsa", hit:true},
-        {x:13, y:2, r:3, exec:233421, cur:"fdsa", hit:true},
-        {x:321, y:2, r:3, exec:233421, cur:"fdsa", hit:true},
       ],
       headersArray: [
         {label: "x", value:"X"},
@@ -34,7 +20,26 @@ export default {
         {label: "exec", value:"Execution Time"},
         {label: "cur", value:"Current Time"},
         {label: "hit", value:"Hit Type"},
-      ]
+      ],
+      calculator: null,
+      calcElement: null,
+      xValue: "",
+      yValue: "",
+      rValue: "",
+      coordinatesFromGraph: null,
+      v$: useVuelidate(),
+      COLORS:{
+        RED_COLOR,
+        GREEN_COLOR
+      },
+      localDots: []
+    }
+  },
+  validations(){
+    return {
+      xValue: {required, between: between(-5, 5)},
+      yValue: {required, between: between(-5, 3)},
+      rValue: {required, between: between(-5, 5)}
     }
   },
   mounted() {
@@ -58,6 +63,85 @@ export default {
       bottom: -5,
       top: 5
     });
+    this.calculator = calculator;
+    this.calcElement = elt;
+  },
+  methods:{
+    drawGraphByR(r){
+      r = +r
+      if (isNaN(Number(r)) || !this.validateR(r)) r = 0
+      if (!isNaN(Number(r))){
+        this.calculator.setExpression({
+          id: 'area-1',
+          latex: 'y\\le ' + r + '\\left\\{0\\le-x\\le ' + r  + '\\right\\}\\left\\{y\\ge0\\right\\}'
+        });
+        this.calculator.setExpression({
+          id: 'area-2',
+          latex: 'y\\ge-x-\\frac{' + r + '}{2}\\left\\{x\\le0\\right\\}\\left\\{y\\le0\\right\\}'
+        });
+        this.calculator.setExpression({
+          id: 'area-3',
+          latex: 'x^{2}+y^{2}\\le ' + r + '^{2}\\left\\{x\\ge0\\right\\}\\left\\{y\\le0\\right\\}'
+        })
+      }
+    },
+    drawDots(x, y, color){
+      if (x !== null && y !== null){
+        this.calculator.setExpression({
+          id: x + '' + y,
+          color: color,
+          latex: '\\left(' + x + ',' + y + '\\right)',
+        })
+      }
+    },
+    checkArea(x, y, r){
+      if (x === "" || y === "" || r === "")return;
+      if (y <= r && (-x>=0) && (r >= -x)&& (y>=0))
+        return true;
+      if (y >= -x-(r/2) && (x <= 0) && (y <= 0))
+        return true
+      return (x * x + y * y <= r * r) && (x >= 0) && (y <= 0);
+
+    },
+    drawDotByAreaHit(x, y, r){
+      const areaHit = this.checkArea(x, y, r);
+      if (areaHit === undefined){
+        return;
+      }
+      if (areaHit){
+        this.drawDots(x, y, this.COLORS.GREEN_COLOR)
+      } else this.drawDots(x, y, this.COLORS.RED_COLOR)
+
+    },
+    addDotsToArray(x, y, r){
+      if (this.validateX(x) && this.validateY(y) && this.validateR(r)){
+        const dots = {x: x, y: y, r: r}
+        this.localDots.push(dots)
+        console.log(this.localDots)
+      }
+    },
+    calculateCordsByGraphClick(e){
+      const calcBounderies = this.calcElement.getBoundingClientRect();
+      const x = e.clientX - calcBounderies.left;
+      const y = e.clientY - calcBounderies.top;
+      this.coordinatesFromGraph = this.calculator.pixelsToMath({x: x, y: y});
+    },
+    changeDotsColorByR(){
+      if (this.rValue !== ""){
+        this.localDots.forEach(dots => this.drawDotByAreaHit(dots.x, dots.y, this.rValue))
+      } else {
+        this.localDots.forEach(dots => this.drawDots(dots.x, dots.y, this.COLORS.RED_COLOR))
+      }
+    },
+    validateX(x){
+      return x >= -5 && x <= 5 && x !== ""
+    },
+    validateY(y){
+      return y>=-5 && y <= 3 && y !== "";
+    },
+    validateR(r){
+      return r >= -5 && r <= 5 && r !== "";
+    }
   }
 }
 </script>
@@ -76,17 +160,27 @@ export default {
       </div>
     </content-box>
     <content-box>
-      <div id="calculator">
+      <div id="calculator" @click="calculateCordsByGraphClick($event); drawDotByAreaHit(this.coordinatesFromGraph.x, this.coordinatesFromGraph.y, this.rValue); addDotsToArray(this.coordinatesFromGraph.x, this.coordinatesFromGraph.y, this.rValue)">
       </div>
     </content-box>
     <content-box>
       <p class="fs-16">Input Form</p>
-      <form @submit.prevent class="main-form">
-        <custom-input label="X value" class="main-input" placeholder-text="X value"></custom-input>
-        <custom-input label="Y value" placeholder-text="Y value"></custom-input>
-        <custom-input label="R value" placeholder-text="R value"></custom-input>
+      <form @submit.prevent  class="main-form">
+        <div class="main-form-input-wrapper">
+          <custom-input label="X value" class="main-input" placeholder-text="Enter value from -5...5" v-model:input-value="xValue">
+          </custom-input>
+          <p class="error-message" v-for="error2 in v$.xValue.$errors" :key="error2.$uid">{{error2.$message}}</p>
+        </div>
+        <div class="main-form-input-wrapper">
+          <custom-input label="Y value" placeholder-text="Enter value from -5..3" v-model:input-value.trim="yValue"></custom-input>
+          <p class="error-message" v-for="error2 in v$.yValue.$errors" :key="error2.$uid">{{error2.$message}}</p>
+        </div>
+        <div class="main-form-input-wrapper">
+          <custom-input label="R value" placeholder-text="Enter value from -5...5" @input="drawGraphByR(this.rValue); changeDotsColorByR()" v-model:input-value.trim="rValue"></custom-input>
+          <p class="error-message" v-for="error3 in v$.rValue.$errors" :key="error3.$uid">{{error3.$message}}</p>
+        </div>
         <div class="form-buttons">
-          <my-button>Send</my-button>
+          <my-button @click="this.v$.$touch(); drawDotByAreaHit(this.xValue, this.yValue, this.rValue); addDotsToArray(this.xValue, this.yValue, this.rValue)">Send</my-button>
           <my-button>Clear</my-button>
         </div>
       </form>
@@ -136,5 +230,10 @@ export default {
 }
 .input-wrap > input{
   width: 70%;
+}
+.error-message{
+  margin-top: 5px;
+  font-size: 11px;
+  color: #e54545;
 }
 </style>

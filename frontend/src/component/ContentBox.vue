@@ -20,5 +20,6 @@ export default {
   background-color: #232931;
   color: white;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
+  overflow: scroll;
 }
 </style>

@@ -7,7 +7,7 @@ export default {
       default: ""
     },
     inputValue: {
-      type: [String, Number],
+      type: [Number, String],
       default: ""
     },
     inputType: {
@@ -25,13 +25,13 @@ export default {
 <template>
   <div class="input-wrap">
     <label>{{ label }}</label>
-    <input
-        class="input"
-        :value="inputValue"
-        :placeholder="placeholderText"
-        :type="inputType"
-        @input="$emit('update:inputValue', $event.target.value)"
-    >
+      <input
+          class="input"
+          :value="inputValue"
+          :placeholder="placeholderText"
+          :type="inputType"
+          @input="$emit('update:inputValue', $event.target.value.trim())"
+      >
   </div>
 </template>
 

@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import useVuelidate from "@vuelidate/core";
-import {required, helpers, url} from "@vuelidate/validators";
+import {required, helpers} from "@vuelidate/validators";
 import CustomInput from "@/component/CustomInput.vue";
 
 
@@ -169,7 +169,7 @@ export default {
 }
 .field-wrap > p{
   text-align: left;
-  margin-left: 5.7%;
+  margin-left: 7%;
   margin-top: 3px;
   font-size: 11px;
   color: #e54545;
