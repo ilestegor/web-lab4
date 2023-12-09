@@ -1,6 +1,8 @@
 import {createRouter, createWebHistory} from "vue-router"
 import Registration from "@/view/Registration.vue";
 import MainPage from "@/view/MainPage.vue";
+import registration from "@/view/Registration.vue";
+import store from "@/store/mainStore";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,9 +20,22 @@ const router = createRouter({
         {
             path:"/main",
             name: "mainPage",
-            component: MainPage
+            component: MainPage,
+            meta: {
+                reqiresAuth: true
+            }
         }
     ]
-
+})
+router.beforeEach((to, from, next) => {
+    if (to.matched.some(record => record.meta.reqiresAuth)){
+        if (store.getters['auth/getUserStatus']){
+            next()
+            return
+        }
+        next("/auth")
+    } else {
+        next()
+    }
 })
 export default router;

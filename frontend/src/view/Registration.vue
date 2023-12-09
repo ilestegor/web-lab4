@@ -1,8 +1,7 @@
 <script>
 
-import axios from "axios";
 import useVuelidate from "@vuelidate/core";
-import {required, helpers} from "@vuelidate/validators";
+import {helpers, required} from "@vuelidate/validators";
 import CustomInput from "@/component/CustomInput.vue";
 
 
@@ -28,71 +27,48 @@ export default {
     }
   },
   methods:{
-    userLogin(){
-      this.v$.$validate();
-      axios.defaults.withCredentials = true;
-      if (!this.v$.$error){
-        fetch("http://localhost:8080/lab4Spring/api/auth/login", {
-          credentials: 'include',
-          method: "post",
-          headers:{
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Cache': 'no-cache'
-          },
-          body: JSON.stringify({
-            username: this.event.login,
-            password: this.event.password
-          })
-        }).then(r => console.log(r.headers));
-
-
-        // axios({
-        //   url:"http://localhost:8080/lab4Spring/api/auth/login",
-        //   method: "post",
-        //   credentials: 'include',
-        //   data:{
-        //     username: this.event.login,
-        //     password: this.event.password
-        //   },
-        //   headers:{
-        //     "Accept": "*/*",
-        //     "Content-Type": 'application/json',
-        //     "Cache-Control": "no-cache",
-        //   },
-        // }).then(r => console.log(r));
-
-
-        // axios.post("http://localhost:8080/lab4Spring/api/auth/login",  {
-        //   username: this.event.login,
-        //   password: this.event.password
-        // }, {
-        //   withCredentials: true,
-        //   headers:{
-        //     'Accept': 'application/json',
-        //     'Content-Type': 'application/json',
-        //     'Cache': 'no-cache'
-        //   }
-        // }).then((r) => console.log(r.headers['set-cookie'])).catch(error => this.AxiosError(error.response.data))
-      }
+    async userLogin(){
+       this.v$.$validate();
+       if (!this.v$.$error){
+         const user = {username: this.event.login, password: this.event.password}
+         const url = "http://localhost:8080/lab4Spring/api/auth/login";
+         const loginRequest = await this.$store.dispatch('auth/userAuthRequest', {user, url});
+         if (loginRequest === null)
+           this.$notify({group: 'user_login', text: 'Server is down, cannot login'})
+         if (loginRequest !== undefined && loginRequest.status === 200)
+           this.$router.push("/main")
+         else if (loginRequest !== undefined){
+           const jsonResponse = await loginRequest.json();
+           this.$notify({group: 'user_login', text: jsonResponse.message})
+         }
+       }
     },
-    userRegister(){
-
+    async userRegister(){
+      this.v$.$validate();
+      if (!this.v$.$error){
+        const user = {username: this.event.login, password: this.event.password}
+        const url = "http://localhost:8080/lab4Spring/api/auth/register";
+        const registerRequest = await this.$store.dispatch('auth/userAuthRequest', {user, url})
+        if (registerRequest.status === 200){
+          this.$router.push("/main")
+        } else if (registerRequest !== null){
+          const jsonResponse = await registerRequest.json();
+          this.$notify({group: 'user_login', text: jsonResponse.message})
+        }
+      }
     },
     changeUserDoesntHaveAccount(){
       this.userHasAccount = false;
     },
     changeUserHasAccount(){
       this.userHasAccount = true;
-    },
-    AxiosError(text){
-      console.log(text)
     }
   }
 }
 </script>
 
 <template>
+  <notifications group="user_login"/>
   <div class="form-wrap common-box-style">
     <h1 v-if="userHasAccount">Login</h1>
     <h1 v-else>Signup</h1>
@@ -117,7 +93,7 @@ export default {
         />
         <p v-for="error in v$.event.password.$errors" :key="error.$uid">{{error.$message}}</p>
       </div>
-      <my-button v-if="userHasAccount" class="registration-btn" @click="userLogin()">Login</my-button>
+      <my-button v-if="userHasAccount" class="registration-btn" @click="userLogin">Login</my-button>
       <my-button v-else class="registration-btn" @click="userRegister()">Register</my-button>
     </form>
     <div class="signup-wrapper m-top10">

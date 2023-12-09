@@ -3,7 +3,9 @@ package ilestegor.lab4.entity;
 
 import jakarta.persistence.*;
 
+import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -21,8 +23,10 @@ public class UserEntity{
     )
     private Collection<RoleEntity> role;
 
+
     public UserEntity() {
     }
+
 
     public long getId() {
         return id;

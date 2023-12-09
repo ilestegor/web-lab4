@@ -10,10 +10,7 @@ export default {
         varNum: "4432"
       }
     }
-
   }
-
-
 }
 
 

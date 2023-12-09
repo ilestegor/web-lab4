@@ -27,7 +27,9 @@ export default {
       yValue: "",
       rValue: "",
       coordinatesFromGraph: null,
-      v$: useVuelidate(),
+      v1$: useVuelidate(),
+      v2$: useVuelidate(),
+      v3$: useVuelidate(),
       COLORS:{
         RED_COLOR,
         GREEN_COLOR
@@ -167,20 +169,20 @@ export default {
       <p class="fs-16">Input Form</p>
       <form @submit.prevent  class="main-form">
         <div class="main-form-input-wrapper">
-          <custom-input label="X value" class="main-input" placeholder-text="Enter value from -5...5" v-model:input-value="xValue">
+          <custom-input label="X value" class="main-input" placeholder-text="Enter value from -5...5" v-model:input-value="xValue" @input="this.v1$.$touch()">
           </custom-input>
-          <p class="error-message" v-for="error2 in v$.xValue.$errors" :key="error2.$uid">{{error2.$message}}</p>
+          <p class="error-message" v-for="error2 in v1$.xValue.$errors" :key="error2.$uid">{{error2.$message}}</p>
         </div>
         <div class="main-form-input-wrapper">
-          <custom-input label="Y value" placeholder-text="Enter value from -5..3" v-model:input-value.trim="yValue"></custom-input>
-          <p class="error-message" v-for="error2 in v$.yValue.$errors" :key="error2.$uid">{{error2.$message}}</p>
+          <custom-input label="Y value" placeholder-text="Enter value from -5..3" v-model:input-value.trim="yValue" @input="this.v2$.$touch()"></custom-input>
+          <p class="error-message" v-for="error2 in v2$.yValue.$errors" :key="error2.$uid">{{error2.$message}}</p>
         </div>
         <div class="main-form-input-wrapper">
-          <custom-input label="R value" placeholder-text="Enter value from -5...5" @input="drawGraphByR(this.rValue); changeDotsColorByR()" v-model:input-value.trim="rValue"></custom-input>
-          <p class="error-message" v-for="error3 in v$.rValue.$errors" :key="error3.$uid">{{error3.$message}}</p>
+          <custom-input label="R value" placeholder-text="Enter value from -5...5" @input="drawGraphByR(this.rValue); changeDotsColorByR(); this.v3$.$touch()" v-model:input-value.trim="rValue"></custom-input>
+          <p class="error-message" v-for="error3 in v3$.rValue.$errors" :key="error3.$uid">{{error3.$message}}</p>
         </div>
         <div class="form-buttons">
-          <my-button @click="this.v$.$touch(); drawDotByAreaHit(this.xValue, this.yValue, this.rValue); addDotsToArray(this.xValue, this.yValue, this.rValue)">Send</my-button>
+          <my-button @click="drawDotByAreaHit(this.xValue, this.yValue, this.rValue); addDotsToArray(this.xValue, this.yValue, this.rValue)">Send</my-button>
           <my-button>Clear</my-button>
         </div>
       </form>
