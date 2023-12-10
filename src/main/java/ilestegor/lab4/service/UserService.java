@@ -10,7 +10,9 @@ import java.util.Optional;
 @NoRepositoryBean
 public interface UserService extends UserDetailsService {
     UserEntity addUser(JWTRequestDto jwtRequestDto, String userRole);
+
     Boolean isUserExistByName(String name);
+
     Optional<UserEntity> findUserByUserName(String name);
 
 }

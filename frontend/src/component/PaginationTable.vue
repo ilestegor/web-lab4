@@ -6,12 +6,12 @@ export default {
   name: "PaginationTable",
   components: {VueAwesomePaginate},
 
-  data(){
+  data() {
     return {
       curPage: 1,
     }
   },
-  props:{
+  props: {
     array: {
       type: Array,
       default: ""
@@ -24,28 +24,28 @@ export default {
       type: Number,
       default: 2
     },
-    headers:{
+    headers: {
       type: Array,
       default: ""
     },
-    labels:{
+    labels: {
       type: Array
     }
   },
-  computed:{
-    totalPages(){
+  computed: {
+    totalPages() {
       //TODO: put array length instead of hardcode
       return Math.ceil(this.array.length / this.contentPerPage)
     },
-    indexStart(){
+    indexStart() {
       return (this.curPage - 1) * this.contentPerPage
     },
-    indexEnd(){
+    indexEnd() {
       return this.indexStart + this.contentPerPage;
     }
   },
-  methods:{
-    paginated(){
+  methods: {
+    paginated() {
       return this.array.slice(this.indexStart, this.indexEnd)
     }
   }
@@ -68,13 +68,13 @@ export default {
     <table>
       <thead>
       <th v-for="(header, index) in this.headers" :key="index">
-        {{header.value}}
+        {{ header.value }}
       </th>
       </thead>
       <tbody>
       <tr v-for="(s, id) in paginated()" :key="id">
         <td v-for="(k) in headers">
-          {{s[k.label]}}
+          {{ s[k.label] }}
         </td>
       </tr>
       </tbody>
@@ -83,19 +83,21 @@ export default {
 </template>
 
 <style>
-.control-panel{
+.control-panel {
   display: flex;
   justify-content: center;
   text-align: center;
   margin-bottom: 10px;
   gap: 5px;
 }
-.control-panel > button{
+
+.control-panel > button {
   background-color: transparent;
   border: none;
   cursor: pointer;
 }
-table, th, tr, td{
+
+table, th, tr, td {
   border: 1px solid white;
   border-collapse: collapse;
   padding: 7px;
@@ -108,6 +110,7 @@ table, th, tr, td{
   list-style: none;
   margin-bottom: 10px;
 }
+
 .paginate-buttons {
   width: 40px;
   border-radius: 20px;
@@ -116,26 +119,32 @@ table, th, tr, td{
   border: 1px solid rgb(217, 217, 217);
   color: black;
 }
+
 .paginate-buttons:hover {
   background-color: #d8d8d8;
 }
+
 .active-page {
   background-color: #3498db;
   border: 1px solid #3498db;
   color: white;
 }
+
 .active-page:hover {
   background-color: #2988c8;
 }
-.arrow-style{
+
+.arrow-style {
   background-color: transparent;
   border: none;
 }
-.paginate-buttons{
+
+.paginate-buttons {
   background-color: transparent;
   color: white;
 }
-.paginate-buttons:hover{
+
+.paginate-buttons:hover {
   background-color: transparent;
 }
 </style>

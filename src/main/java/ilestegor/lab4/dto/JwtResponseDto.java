@@ -1,16 +1,20 @@
 package ilestegor.lab4.dto;
 
 public class JwtResponseDto {
-    private final String accessToken;
+    private long tokenExpirationDate;
     private String tokenType;
 
-    public JwtResponseDto(String accessToken, String tokenType) {
-        this.accessToken = accessToken;
+    public JwtResponseDto(long tokenExpirationDate, String tokenType) {
+        this.tokenExpirationDate = tokenExpirationDate;
         this.tokenType = tokenType;
     }
 
-    public String getAccessToken() {
-        return accessToken;
+    public long getTokenExpirationDate() {
+        return tokenExpirationDate;
+    }
+
+    public void setTokenExpirationDate(long tokenExpirationDate) {
+        this.tokenExpirationDate = tokenExpirationDate;
     }
 
     public String getTokenType() {

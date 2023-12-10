@@ -11,7 +11,7 @@ export default {
 </template>
 
 <style scoped>
-.box{
+.box {
   border-radius: 10px;
   padding: 10px 10px;
   max-height: 350px;

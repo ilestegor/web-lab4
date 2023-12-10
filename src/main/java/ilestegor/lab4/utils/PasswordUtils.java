@@ -14,7 +14,7 @@ public class PasswordUtils {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public String hashPassword(String pwd){
+    public String hashPassword(String pwd) {
         return passwordEncoder.encode(pwd);
     }
 }

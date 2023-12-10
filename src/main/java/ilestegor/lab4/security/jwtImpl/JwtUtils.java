@@ -1,9 +1,7 @@
 package ilestegor.lab4.security.jwtImpl;
 
-import ilestegor.lab4.entity.RoleEntity;
 import ilestegor.lab4.security.IJwtUtils;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.impl.DefaultHeader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -23,7 +21,7 @@ public class JwtUtils implements IJwtUtils {
     private Duration tokenLifeTime;
 
     @Override
-    public String generateAccessToken(Authentication authentication){
+    public String generateAccessToken(Authentication authentication) {
         Map<String, Object> claims = new HashMap<>();
         List<String> rolesList = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
         claims.put("roles", rolesList);
@@ -38,7 +36,7 @@ public class JwtUtils implements IJwtUtils {
     }
 
     @Override
-    public String generateAccessToken(String username,  Collection<GrantedAuthority> roleEntities) {
+    public String generateAccessToken(String username, Collection<GrantedAuthority> roleEntities) {
         Map<String, Object> claims = new HashMap<>();
         List<String> rolesList = roleEntities.stream().map(GrantedAuthority::getAuthority).toList();
         claims.put("roles", rolesList);
@@ -65,11 +63,11 @@ public class JwtUtils implements IJwtUtils {
         return validateToken(token);
     }
 
-    private boolean validateToken(String token){
+    private boolean validateToken(String token) {
         try {
             Jwts.parser().setSigningKey(tokenSecret).parseClaimsJws(token);
             return true;
-        } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException ex){
+        } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException ex) {
             return false;
         }
     }

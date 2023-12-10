@@ -1,7 +1,4 @@
 import {createRouter, createWebHistory} from "vue-router"
-import Registration from "@/view/Registration.vue";
-import MainPage from "@/view/MainPage.vue";
-import registration from "@/view/Registration.vue";
 import store from "@/store/mainStore";
 
 const router = createRouter({
@@ -10,26 +7,28 @@ const router = createRouter({
         {
             path: "/",
             name: 'startPage',
-            component: Registration
+            component: () => import("@/view/Registration.vue")
         },
         {
             path: "/auth",
             name: 'authPage',
-            component: Registration
+            component: () => import("@/view/Registration.vue")
         },
         {
-            path:"/main",
+            path: "/main",
             name: "mainPage",
-            component: MainPage,
+            component: () => import("@/view/MainPage.vue"),
             meta: {
                 reqiresAuth: true
-            }
+            },
         }
     ]
 })
 router.beforeEach((to, from, next) => {
-    if (to.matched.some(record => record.meta.reqiresAuth)){
-        if (store.getters['auth/getUserStatus']){
+    // console.log(to)
+    if (to.matched.some(record => record.meta.reqiresAuth)) {
+        if (localStorage.getItem("exp_date") > Date.now()) {
+            store.commit('auth/changeUserStatus', true)
             next()
             return
         }

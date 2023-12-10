@@ -32,12 +32,12 @@ class DBConfig {
 
     @Bean
     public DataSource dataSource() {
-       final DriverManagerDataSource driver = new DriverManagerDataSource();
-       driver.setDriverClassName(DB_DRIVER);
-       driver.setUrl(DB_URL);
-       driver.setUsername(username);
-       driver.setPassword(password);
-       return driver;
+        final DriverManagerDataSource driver = new DriverManagerDataSource();
+        driver.setDriverClassName(DB_DRIVER);
+        driver.setUrl(DB_URL);
+        driver.setUsername(username);
+        driver.setPassword(password);
+        return driver;
     }
 
     @Bean

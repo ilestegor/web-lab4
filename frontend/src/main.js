@@ -1,5 +1,5 @@
 import '@/style/global-style.css'
-import { createApp } from 'vue'
+import {createApp} from 'vue'
 import App from './App.vue'
 import components from "@/globalRegistration"
 import router from "@/router/router";

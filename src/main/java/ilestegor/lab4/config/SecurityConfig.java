@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,15 +18,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception{
+    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .csrf(AbstractHttpConfigurer::disable).cors(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         (ar) ->
                         {
                             ar.requestMatchers("/api/auth/**").permitAll();
-                            ar.anyRequest().authenticated();
+                            ar.requestMatchers("/api/dots/**").authenticated();
                         }
                 );
         httpSecurity.exceptionHandling(exceptionHandlingConfigurer -> exceptionHandlingConfigurer.authenticationEntryPoint(
@@ -33,7 +35,8 @@ public class SecurityConfig {
                         exception.getMessage())
         ));
         httpSecurity.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        httpSecurity.addFilterBefore(getJWTAuthFilter(), UsernamePasswordAuthenticationFilter.class);
+        httpSecurity.addFilterAfter(getJWTAuthFilter(), UsernamePasswordAuthenticationFilter.class);
+        httpSecurity.httpBasic(Customizer.withDefaults());
         return httpSecurity.build();
     }
 
@@ -41,13 +44,14 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
+
     @Bean
-    public BCryptPasswordEncoder passwordEncoder(){
+    public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public JwtAuthFilter getJWTAuthFilter(){
+    public JwtAuthFilter getJWTAuthFilter() {
         return new JwtAuthFilter();
     }
 }

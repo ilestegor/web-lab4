@@ -2,7 +2,7 @@
 export default {
   name: "my-header",
 
-  props:{
+  props: {
     author: {
       type: String,
       default: ""
@@ -20,14 +20,14 @@ export default {
 </script>
 
 <template>
-    <div class="header">
-      <p>{{author}} {{group}}</p>
-      <p>Var: {{ varNum }}</p>
-    </div>
+  <div class="header">
+    <p>{{ author }} {{ group }}</p>
+    <p>Var: {{ varNum }}</p>
+  </div>
 </template>
 
 <style scoped>
-.header{
+.header {
   width: 100%;
   border-radius: 10px;
   padding: 10px 0;
@@ -36,9 +36,11 @@ export default {
   box-shadow: 0 0 20px -10px white;
   transition: all 0.5s ease;
 }
+
 .header p:first-child {
   margin-bottom: 5px;
 }
+
 .header:hover {
   transform: scale(1.05);
 }

@@ -2,9 +2,9 @@ package ilestegor.lab4.exceptions;
 
 import java.util.Date;
 
-public class ErrorObject{
+public class ErrorObject {
     private Integer statusCode;
-    private String message;
+    private String detailMessage;
     private Date timeStamp;
 
     public Integer getStatusCode() {
@@ -12,7 +12,7 @@ public class ErrorObject{
     }
 
     public String getMessage() {
-        return message;
+        return detailMessage;
     }
 
     public Date getTimeStamp() {
@@ -23,8 +23,8 @@ public class ErrorObject{
         this.statusCode = statusCode;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setMessage(String detailMessage) {
+        this.detailMessage = detailMessage;
     }
 
     public void setTimeStamp(Date timeStamp) {

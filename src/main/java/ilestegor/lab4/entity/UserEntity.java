@@ -3,13 +3,11 @@ package ilestegor.lab4.entity;
 
 import jakarta.persistence.*;
 
-import java.lang.reflect.Type;
 import java.util.Collection;
-import java.util.List;
 
 @Entity
 @Table(name = "users")
-public class UserEntity{
+public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;

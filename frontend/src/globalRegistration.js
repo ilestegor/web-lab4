@@ -5,6 +5,7 @@ import CustomInput from "@/component/CustomInput.vue";
 import MainPage from "@/view/MainPage.vue";
 import ContentBox from "@/component/ContentBox.vue";
 import PaginationTable from "@/component/PaginationTable.vue";
+
 export default [
     Button,
     Header,

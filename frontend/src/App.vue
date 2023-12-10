@@ -1,9 +1,8 @@
 <script>
-import {RouterView} from "vue-router";
 
 export default {
-  data(){
-    return{
+  data() {
+    return {
       headerProps: {
         author: "Glotov E. D.",
         group: "P3232",
@@ -17,8 +16,8 @@ export default {
 </script>
 
 <template>
-    <my-header v-bind="headerProps"></my-header>
-    <RouterView/>
+  <my-header v-bind="headerProps"></my-header>
+  <RouterView/>
 </template>
 
 <style scoped>

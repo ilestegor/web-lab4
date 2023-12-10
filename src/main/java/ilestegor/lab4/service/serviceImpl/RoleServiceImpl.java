@@ -4,6 +4,7 @@ import ilestegor.lab4.entity.RoleEntity;
 import ilestegor.lab4.repository.RoleRepository;
 import ilestegor.lab4.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +21,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Collection<SimpleGrantedAuthority> mapRolesToSimpleGrantedAuthority(Collection<RoleEntity> roleCollection) {
+    public Collection<GrantedAuthority> mapRolesToSimpleGrantedAuthority(Collection<RoleEntity> roleCollection) {
         return roleCollection.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
     }
 

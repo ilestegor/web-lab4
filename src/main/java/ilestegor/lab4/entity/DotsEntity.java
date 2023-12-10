@@ -3,12 +3,11 @@ package ilestegor.lab4.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "dots")
+@Table(name = "result_dots")
 public class DotsEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-
     @Column(name = "x", nullable = false)
     private double x;
     @Column(name = "y", nullable = false)

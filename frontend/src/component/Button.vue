@@ -5,11 +5,10 @@ export default {
 </script>
 
 <template>
-    <button class="btn">
-      <slot></slot>
-    </button>
+  <button class="btn">
+    <slot></slot>
+  </button>
 </template>
-
 
 
 <style scoped>

@@ -8,60 +8,70 @@ import CustomInput from "@/component/CustomInput.vue";
 export default {
   name: 'registration-component',
   components: {CustomInput},
-  data(){
+  data() {
     return {
       v$: useVuelidate(),
-      event:{
+      event: {
         login: "",
         password: ""
       },
       userHasAccount: true,
     }
   },
-  validations(){
+  validations() {
     return {
-      event:{
+      event: {
         login: {required: helpers.withMessage('Username field cannot be empty', required)},
         password: {required: helpers.withMessage('Password field cannot be empty', required)}
       }
     }
   },
-  methods:{
-    async userLogin(){
-       this.v$.$validate();
-       if (!this.v$.$error){
-         const user = {username: this.event.login, password: this.event.password}
-         const url = "http://localhost:8080/lab4Spring/api/auth/login";
-         const loginRequest = await this.$store.dispatch('auth/userAuthRequest', {user, url});
-         if (loginRequest === null)
-           this.$notify({group: 'user_login', text: 'Server is down, cannot login'})
-         if (loginRequest !== undefined && loginRequest.status === 200)
-           this.$router.push("/main")
-         else if (loginRequest !== undefined){
-           const jsonResponse = await loginRequest.json();
-           this.$notify({group: 'user_login', text: jsonResponse.message})
-         }
-       }
-    },
-    async userRegister(){
+  methods: {
+    async userLogin() {
       this.v$.$validate();
-      if (!this.v$.$error){
+      if (!this.v$.$error) {
         const user = {username: this.event.login, password: this.event.password}
-        const url = "http://localhost:8080/lab4Spring/api/auth/register";
-        const registerRequest = await this.$store.dispatch('auth/userAuthRequest', {user, url})
-        if (registerRequest.status === 200){
+        const url = "http://localhost:8080/lab4Spring/api/auth/login";
+        const loginRequest = await this.$store.dispatch('auth/userAuthRequest', {user, url});
+        if (loginRequest === null) {
+          this.$notify({group: 'user_login', text: 'Server is down, cannot login'})
+          return;
+        }
+        if (loginRequest !== undefined && loginRequest.status === 200) {
+          const validResponse = await loginRequest.json()
+          localStorage.setItem("exp_date", validResponse.tokenExpirationDate.toString())
           this.$router.push("/main")
-        } else if (registerRequest !== null){
-          const jsonResponse = await registerRequest.json();
-          this.$notify({group: 'user_login', text: jsonResponse.message})
+        } else if (loginRequest !== undefined) {
+          const jsonResponse = await loginRequest.json();
+          this.$notify({group: 'user_login', text: jsonResponse.detailMessage})
         }
       }
     },
-    changeUserDoesntHaveAccount(){
+    async userRegister() {
+      this.v$.$validate();
+      if (!this.v$.$error) {
+        const user = {username: this.event.login, password: this.event.password}
+        const url = "http://localhost:8080/lab4Spring/api/auth/register";
+        const registerRequest = await this.$store.dispatch('auth/userAuthRequest', {user, url})
+        if (registerRequest.status === 200) {
+          localStorage.setItem("exp_date", validResponse.tokenExpirationDate.toString())
+          this.$router.push("/main")
+        } else if (registerRequest !== null) {
+          const jsonResponse = await registerRequest.json();
+          this.$notify({group: 'user_login', text: jsonResponse.detailsMessage})
+        }
+      }
+    },
+    changeUserDoesntHaveAccount() {
       this.userHasAccount = false;
     },
-    changeUserHasAccount(){
+    changeUserHasAccount() {
       this.userHasAccount = true;
+    }
+  },
+  mounted() {
+    if (localStorage.getItem("exp_date") !== null && localStorage.getItem('exp_date') < Date.now()) {
+      this.$notify({group: 'user_login', text: 'Token is expired, log in again'})
     }
   }
 }
@@ -81,7 +91,7 @@ export default {
             v-model:input-value.trim="event.login"
             placeholder="Username"
         />
-        <p v-for="error in v$.event.login.$errors" :key="error.$uid">{{error.$message}}</p>
+        <p v-for="error in v$.event.login.$errors" :key="error.$uid">{{ error.$message }}</p>
       </div>
       <div class="field-wrap">
         <custom-input
@@ -91,20 +101,21 @@ export default {
             v-model:input-value.trim="event.password"
             placeholder="Password"
         />
-        <p v-for="error in v$.event.password.$errors" :key="error.$uid">{{error.$message}}</p>
+        <p v-for="error in v$.event.password.$errors" :key="error.$uid">{{ error.$message }}</p>
       </div>
       <my-button v-if="userHasAccount" class="registration-btn" @click="userLogin">Login</my-button>
       <my-button v-else class="registration-btn" @click="userRegister()">Register</my-button>
     </form>
     <div class="signup-wrapper m-top10">
-      <p v-if="userHasAccount">Don`t have an account? <span class="signup-link" @click="changeUserDoesntHaveAccount()">SignUp</span></p>
+      <p v-if="userHasAccount">Don`t have an account? <span class="signup-link" @click="changeUserDoesntHaveAccount()">SignUp</span>
+      </p>
       <p v-else>Already have an account? <span class="signup-link" @click="changeUserHasAccount()">Login</span></p>
     </div>
   </div>
 </template>
 
 <style>
-.form-wrap{
+.form-wrap {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -117,33 +128,41 @@ export default {
   height: 100%;
   min-height: 300px;
 }
-.form-wrap > h1{
+
+.form-wrap > h1 {
   font-size: 28px;
 }
-.registration-btn{
+
+.registration-btn {
   margin-top: 15px;
   width: 90%;
 }
-.form{
+
+.form {
   width: 100%;
 }
-.input-field > .input{
+
+.input-field > .input {
   width: 90%;
 }
-.registration-btn > .btn{
+
+.registration-btn > .btn {
   width: 90%;
 }
-.signup-link{
+
+.signup-link {
   cursor: pointer;
   text-decoration: none;
   color: #6472da;
 }
-.field-wrap{
+
+.field-wrap {
   display: flex;
   flex-direction: column;
   width: 100%;
 }
-.field-wrap > p{
+
+.field-wrap > p {
   text-align: left;
   margin-left: 7%;
   margin-top: 3px;

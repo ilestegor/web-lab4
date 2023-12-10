@@ -25,13 +25,13 @@ export default {
 <template>
   <div class="input-wrap">
     <label>{{ label }}</label>
-      <input
-          class="input"
-          :value="inputValue"
-          :placeholder="placeholderText"
-          :type="inputType"
-          @input="$emit('update:inputValue', $event.target.value.trim())"
-      >
+    <input
+        class="input"
+        :value="inputValue"
+        :placeholder="placeholderText"
+        :type="inputType"
+        @input="$emit('update:inputValue', $event.target.value.trim())"
+    >
   </div>
 </template>
 
@@ -43,6 +43,7 @@ export default {
   border-radius: 10px;
   padding: 5px 10px;
 }
+
 ::placeholder {
   text-align: left;
   font-size: 12px;
