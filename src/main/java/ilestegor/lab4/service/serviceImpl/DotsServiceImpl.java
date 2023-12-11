@@ -22,7 +22,7 @@ import java.util.List;
 @Slf4j
 public class DotsServiceImpl implements DotsService {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yy HH:mm:ss");
-    private static final short COUNT_OF_NUMBERS_AFTER_DECIMAL_POINT = 5;
+    private static final short COUNT_OF_NUMBERS_AFTER_DECIMAL_POINT = 3;
     private static final double DIVIDER = Math.pow(10, COUNT_OF_NUMBERS_AFTER_DECIMAL_POINT);
     private final DotsRepository dotsRepository;
     private final UserService userService;
@@ -52,7 +52,6 @@ public class DotsServiceImpl implements DotsService {
             dotsEntity.setExecutionTime(System.nanoTime() - startExec);
             dotsEntity.setUser(userService.findUserByUserName(authentication.getName()).get());
             return dotsRepository.save(dotsEntity);
-//            return dotsEntity;
         } else {
             throw new CoordinateValuesException("Coordinates values are out of range");
         }
@@ -62,7 +61,7 @@ public class DotsServiceImpl implements DotsService {
     @Transactional
     public int deleteDotsByUserId(Authentication authentication) {
         int dotsDeletedCount = dotsRepository.deleteAllByUserId(userService.findUserByUserName(authentication.getName()).get().getId());
-        if (dotsDeletedCount > 0) {
+        if (dotsDeletedCount >= 0) {
             return dotsDeletedCount;
         } else {
             throw new DotsDeleteException("Dot were not deleted");

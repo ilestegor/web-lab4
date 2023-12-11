@@ -4,12 +4,13 @@
 import PaginationTable from "@/component/PaginationTable.vue";
 import useVuelidate from "@vuelidate/core";
 import {between, required} from "@vuelidate/validators";
+import MyButton from "@/component/Button.vue";
 
 const RED_COLOR = "#00fff7";
 const GREEN_COLOR = "#aa00ff"
 export default {
   name: "MainPage",
-  components: {PaginationTable},
+  components: {MyButton, PaginationTable},
   data() {
     return {
       headersArray: [
@@ -34,7 +35,8 @@ export default {
         GREEN_COLOR
       },
       resultArray: [],
-      graphInitialState: null
+      graphInitialState: null,
+      windowWidth: window.innerWidth
     }
   },
   validations() {
@@ -68,10 +70,18 @@ export default {
     this.calculator = calculator;
     this.calcElement = elt;
     this.graphInitialState = this.calculator.getState();
-
     await this.getAllResults();
+    await this.$nextTick(() => {
+      window.addEventListener('resize', this.onResize);
+    })
+  },
+  beforeUnmount() {
+    window.removeEventListener('resize', this.onResize);
   },
   methods: {
+    onResize() {
+      this.windowWidth = window.innerWidth
+    },
     drawGraphByR(r) {
       r = +r
       if (isNaN(Number(r)) || !this.validateR(r)) r = 0
@@ -158,12 +168,15 @@ export default {
       }
       switch (response.status) {
         case 401:
-          this.$router.push("/auth");
-          break;
+          this.$notify({group: 'main-errors', text: 'Not authorized. Dots can not be loaded'});
+          setTimeout(() => {
+            this.$router.push("/auth");
+          }, 3000)
+          return false;
         case 400:
           const parsedResponse = await response.json();
           this.$notify({group: 'main-errors', text: parsedResponse.detailMessage, type: 'warn'});
-          break;
+          return false;
         case 200:
           return response.json();
       }
@@ -177,61 +190,117 @@ export default {
         this.$notify({group: 'main-errors', text: 'R value must be specified', type: 'warn'})
       } else {
         const response = await this.addDotsRequest(x, y, r);
-        this.addResultToArray(response.x, response.y, response.r, response.executionTime, response.curRequestTime, response.hitType)
+        if (response)
+          await this.addResultToArray(response.x, response.y, response.r, response.curRequestTime, response.executionTime, response.hitType)
       }
     },
     async addDotsByForm(x, y, r) {
       if (this.validateX(x) && this.validateY(y) && this.validateR(r)) {
         const response = await this.addDotsRequest(x, y, r);
-        this.addResultToArray(response.x, response.y, response.r, response.executionTime, response.curRequestTime, response.hitType)
+        if (response)
+          this.addResultToArray(response.x, response.y, response.r, response.curRequestTime, response.executionTime, response.hitType)
       } else {
         this.$notify({group: 'main-errors', text: 'Values in form are not valid'})
       }
     },
     async getAllResults() {
-      const userResult = await this.$store.dispatch('auth/userGetRequest', "http://localhost:8080/lab4Spring/api/dots/getDots")
-      this.resultArray = await userResult.json()
-      this.resultArray.forEach(result => this.drawDotByAreaHit(result.x, result.y, result.r))
+      const url = "http://localhost:8080/lab4Spring/api/dots/getDots"
+      const method = 'get'
+      const userResult = await this.$store.dispatch('auth/requestWithoutParams', {url, method})
+      if (userResult !== null) {
+        switch (userResult.status) {
+          case 401:
+            this.notAuthResponseHandler('Not authorized. Dots can not be loaded');
+            return false;
+          case 200:
+            this.resultArray = await userResult.json()
+            this.resultArray.forEach(result => this.drawDotByAreaHit(result.x, result.y, result.r));
+            return true;
+        }
+      } else {
+        this.$notify({group: 'main-errors', text: 'Server is down', type: 'warn'})
+      }
     },
     async deleteDotsRequest() {
-      const response = await this.$store.dispatch('auth/deleteRequest', "http://localhost:8080/lab4Spring/api/dots/deleteDots")
+      const url = "http://localhost:8080/lab4Spring/api/dots/deleteDots";
+      const method = 'delete'
+      const response = await this.$store.dispatch('auth/requestWithoutParams', {url, method})
       if (response !== null) {
-        const parsedResponse = await response.text();
-        this.$notify({group: 'info', text: parsedResponse})
-        this.clearLocalDots();
-        this.calculator.setState(this.graphInitialState)
+        switch (response.status) {
+          case 200:
+            const parsedResponse = await response.text();
+            this.$notify({group: 'info', text: parsedResponse})
+            this.clearLocalDots();
+            this.calculator.setState(this.graphInitialState);
+            this.$refs["my-form"].reset();
+            break;
+          case 400:
+            const jsonResponse = await response.json();
+            this.$notify({group: 'main-errors', text: jsonResponse.detailMessage, type: 'warn'})
+        }
+      } else {
+        this.$notify({group: 'main-errors', text: 'Server is down', type: 'warn'})
       }
+    },
+    notAuthResponseHandler(message) {
+      this.$notify({group: 'main-errors', text: message});
+      setTimeout(() => {
+        this.$router.push("/auth");
+      }, 1000)
     },
     clearLocalDots() {
       this.resultArray = []
+    },
+    async logoutRequest() {
+      const url = "http://localhost:8080/lab4Spring/api/auth/logout"
+      const data = "";
+      const logoutResponse = await this.$store.dispatch('auth/userMainPageRequest', {data, url})
+      if (logoutResponse !== null) {
+        switch (logoutResponse.status) {
+          case 200:
+            const parsedLogoutResponse = await logoutResponse.json();
+            this.notAuthResponseHandler(parsedLogoutResponse.message);
+            localStorage.removeItem("exp_date")
+            break;
+        }
+      }
+    },
+    passMaxPerPageShown() {
+      if (this.windowWidth < 550 || this.windowWidth > 874) {
+        console.log(this.windowWidth)
+        return 4;
+      } else if (this.windowWidth < 874) {
+        return 7;
+      }
     }
   }
 }
 </script>
 
 <template>
-  <section class="main-section">
+  <my-button id="close-btn" @click="logoutRequest"></my-button>
+  <section class="main-section" id="media-section">
     <notifications group="main-errors"/>
     <notifications group="info"/>
-    <content-box>
+    <content-box id="table-box">
       <p class="fs-16">History Table</p>
       <div class="pag-table">
         <pagination-table
             :array="this.resultArray"
-            :content-per-page="4"
+            :content-per-page="this.passMaxPerPageShown()"
             :max-page-show="2"
             :headers="this.headersArray"
         />
       </div>
     </content-box>
-    <content-box>
+    <content-box id="calculator-content-box">
       <div id="calculator"
            @click="calculateCordsByGraphClick($event); drawDotByAreaHit(this.coordinatesFromGraph.x, this.coordinatesFromGraph.y, this.rValue);  addDotsByGraphClick(this.coordinatesFromGraph.x, this.coordinatesFromGraph.y, this.rValue)">
       </div>
     </content-box>
     <content-box>
       <p class="fs-16">Input Form</p>
-      <form @submit.prevent class="main-form">
+      <form @submit.prevent class="main-form" ref="my-form">
         <div class="main-form-input-wrapper">
           <custom-input label="X value" class="main-input" placeholder-text="Enter value from -5...5"
                         v-model:input-value="xValue" @input="this.v1$.$touch()">
@@ -317,5 +386,75 @@ export default {
   margin-top: 5px;
   font-size: 11px;
   color: #e54545;
+}
+
+#close-btn {
+  box-sizing: border-box;
+  display: inline-block;
+  float: right;
+  width: 33px;
+  height: 33px;
+  background-color: transparent;
+  box-shadow: inset 0 0 0 2px #232931;
+  border-radius: 50%;
+  position: absolute;
+  cursor: pointer;
+  border: none;
+  top: 30px;
+  right: 30px;
+  z-index: 10;
+}
+
+#close-btn:after,
+#close-btn:before {
+  content: "";
+  position: absolute;
+  background-color: #232931;
+}
+
+#close-btn:after {
+  width: 2px;
+  height: 30px;
+  top: 1px;
+  left: 15px;
+  transform: rotate(45deg);
+}
+
+#close-btn:before {
+  width: 30px;
+  height: 2px;
+  top: 15px;
+  left: 1px;
+  transform: rotate(45deg);
+}
+
+#close-btn:hover:after {
+  transform: rotate(-90deg);
+  transition: transform 0.5s;
+}
+
+#close-btn:hover:before {
+  transform: rotate(-180deg);
+  transition: transform 0.5s;
+}
+
+#table-box {
+  min-width: 328px;
+}
+
+@media screen and (max-width: 874px) {
+  #media-section {
+    flex-direction: column;
+  }
+
+  #calculator {
+    height: 350px;
+  }
+
+  #calculator-content-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 }
 </style>

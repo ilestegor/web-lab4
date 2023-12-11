@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     private final AuthService authService;
 
+
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
@@ -32,5 +33,10 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<JwtResponseDto> register(@RequestBody JWTRequestDto requestDto, HttpServletResponse response) {
         return new ResponseEntity<>(authService.register(requestDto, response), HttpStatus.OK);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        return new ResponseEntity<>(authService.logout(response), HttpStatus.OK);
     }
 }

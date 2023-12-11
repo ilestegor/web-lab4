@@ -15,12 +15,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Service
 @Slf4j
 public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final IJwtUtils ijwtUtils;
+    private final static short LOGOUT_COOKIE_AGE = 1;
 
     public AuthServiceImpl(AuthenticationManager authenticationManager, UserService userService, IJwtUtils ijwtUtils) {
         this.authenticationManager = authenticationManager;
@@ -34,6 +37,7 @@ public class AuthServiceImpl implements AuthService {
         try {
             authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(jwtRequestDto.username(), jwtRequestDto.password()));
+            log.info(String.valueOf(authentication));
         } catch (AuthenticationException ex) {
             throw new ilestegor.lab4.exceptions.AuthenticationException("Login or password are incorrect");
         }
@@ -53,5 +57,15 @@ public class AuthServiceImpl implements AuthService {
         }
         userService.addUser(jwtRequestDto, "USER");
         return login(jwtRequestDto, response);
+    }
+
+    @Override
+    public JwtResponseDto logout(HttpServletResponse response) {
+        Cookie cookie = new Cookie("Token", "");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(LOGOUT_COOKIE_AGE);
+        cookie.setPath("/");
+        response.addCookie(cookie);
+        return new JwtResponseDto(new Date().getTime(), "JWT", "You are logged out");
     }
 }

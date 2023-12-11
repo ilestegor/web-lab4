@@ -52,26 +52,16 @@ const authModule = {
                 return null
             }
         },
-        async userGetRequest(_, url) {
+        async requestWithoutParams(_, {url, method}) {
             try {
                 return await fetch(url, {
                     credentials: 'include',
-                    method: 'get'
+                    method: method
                 })
             } catch (ex) {
                 return null;
             }
         },
-        async deleteRequest(_, url) {
-            try {
-                return await fetch(url, {
-                    credentials: 'include',
-                    method: 'delete'
-                })
-            } catch (ex) {
-                return null;
-            }
-        }
     }
 }
 

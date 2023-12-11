@@ -1,7 +1,10 @@
 package ilestegor.lab4.security.jwtImpl;
 
 import ilestegor.lab4.security.IJwtUtils;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -67,7 +70,7 @@ public class JwtUtils implements IJwtUtils {
         try {
             Jwts.parser().setSigningKey(tokenSecret).parseClaimsJws(token);
             return true;
-        } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException ex) {
+        } catch (JwtException ex) {
             return false;
         }
     }

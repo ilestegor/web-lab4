@@ -8,4 +8,6 @@ public interface AuthService {
     JwtResponseDto login(JWTRequestDto jwtRequestDto, HttpServletResponse response);
 
     JwtResponseDto register(JWTRequestDto jwtRequestDto, HttpServletResponse response);
+
+    JwtResponseDto logout(HttpServletResponse response);
 }

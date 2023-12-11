@@ -53,12 +53,19 @@ export default {
         const user = {username: this.event.login, password: this.event.password}
         const url = "http://localhost:8080/lab4Spring/api/auth/register";
         const registerRequest = await this.$store.dispatch('auth/userAuthRequest', {user, url})
-        if (registerRequest.status === 200) {
-          localStorage.setItem("exp_date", validResponse.tokenExpirationDate.toString())
-          this.$router.push("/main")
-        } else if (registerRequest !== null) {
-          const jsonResponse = await registerRequest.json();
-          this.$notify({group: 'user_login', text: jsonResponse.detailsMessage})
+        if (registerRequest !== null) {
+          console.log(registerRequest)
+          switch (registerRequest.status) {
+            case 200:
+              localStorage.setItem("exp_date", validResponse.tokenExpirationDate.toString())
+              this.$router.push("/main");
+              break;
+            case 400:
+              const jsonResponse = await registerRequest.json();
+              this.$notify({group: 'user_login', text: jsonResponse.detailMessage})
+          }
+        } else {
+          this.$notify({group: 'user_login', text: 'Server is down, cannot register'})
         }
       }
     },

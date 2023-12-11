@@ -23,9 +23,6 @@ public class DotController {
 
     @PostMapping("add")
     public ResponseEntity<DotsResponseDto> addDots(@RequestBody DotsRequestDto dotsRequestDto, Authentication user) {
-        log.info(String.valueOf(dotsRequestDto.x()));
-        log.info(String.valueOf(dotsRequestDto.y()));
-        log.info(String.valueOf(dotsRequestDto.r()));
         DotsResponseDto responseDto = dotsService.mapDotsEntityToResponseDotsDto(dotsService.addDot(dotsRequestDto, user));
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }

@@ -100,7 +100,7 @@ export default {
 table, th, tr, td {
   border: 1px solid white;
   border-collapse: collapse;
-  padding: 7px;
+  padding: 3px;
 }
 
 .pagination-container {
