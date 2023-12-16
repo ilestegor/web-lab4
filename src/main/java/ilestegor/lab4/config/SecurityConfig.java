@@ -28,6 +28,7 @@ public class SecurityConfig {
                         {
                             ar.requestMatchers("/api/auth/**").permitAll();
                             ar.requestMatchers("/api/dots/**").authenticated();
+                            ar.anyRequest().authenticated();
                         }
                 );
         httpSecurity.exceptionHandling(exceptionHandlingConfigurer -> exceptionHandlingConfigurer.authenticationEntryPoint(

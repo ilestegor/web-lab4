@@ -10,7 +10,6 @@ import ilestegor.lab4.repository.DotsRepository;
 import ilestegor.lab4.service.DotsService;
 import ilestegor.lab4.service.UserService;
 import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +18,6 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-@Slf4j
 public class DotsServiceImpl implements DotsService {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yy HH:mm:ss");
     private static final short COUNT_OF_NUMBERS_AFTER_DECIMAL_POINT = 3;

@@ -236,7 +236,11 @@ export default {
             break;
           case 400:
             const jsonResponse = await response.json();
-            this.$notify({group: 'main-errors', text: jsonResponse.detailMessage, type: 'warn'})
+            this.$notify({group: 'main-errors', text: jsonResponse.detailMessage, type: 'warn'});
+            break;
+          case 401:
+            this.notAuthResponseHandler("Not authorised. Returning to login page");
+            break;
         }
       } else {
         this.$notify({group: 'main-errors', text: 'Server is down', type: 'warn'})

@@ -6,7 +6,6 @@ import ilestegor.lab4.repository.UserRepository;
 import ilestegor.lab4.service.RoleService;
 import ilestegor.lab4.service.UserService;
 import ilestegor.lab4.utils.PasswordUtils;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,7 +17,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Slf4j
 public class UserServiceImpl implements UserDetailsService, UserService {
     private final UserRepository userRepository;
     private final RoleService roleService;

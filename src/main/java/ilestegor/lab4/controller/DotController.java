@@ -3,7 +3,6 @@ package ilestegor.lab4.controller;
 import ilestegor.lab4.dto.DotsRequestDto;
 import ilestegor.lab4.dto.DotsResponseDto;
 import ilestegor.lab4.service.DotsService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -13,7 +12,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/dots")
-@Slf4j
 public class DotController {
     private final DotsService dotsService;
 

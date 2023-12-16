@@ -8,7 +8,6 @@ import ilestegor.lab4.service.AuthService;
 import ilestegor.lab4.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 
 @Service
-@Slf4j
 public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
@@ -37,7 +35,6 @@ public class AuthServiceImpl implements AuthService {
         try {
             authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(jwtRequestDto.username(), jwtRequestDto.password()));
-            log.info(String.valueOf(authentication));
         } catch (AuthenticationException ex) {
             throw new ilestegor.lab4.exceptions.AuthenticationException("Login or password are incorrect");
         }
